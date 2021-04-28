@@ -209,17 +209,18 @@ string LinuxParser::Command(int pid) {
 
 string LinuxParser::Ram(int pid) { 
   
+ string name, ram;
   string line;
-  string VmSize;
-  string returnValue;
-  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatusFilename);
-  if(filestream.is_open()) {
-    while(std::getline(filestream, line)) {
+  std::ifstream stream(kProcDirectory + to_string(pid) + kStatusFilename);
+  if (stream.is_open()) {
+    while(std::getline(stream, line))
+    {
       std::istringstream linestream(line);
-      linestream >> VmSize >> returnValue;
-    }
+      linestream >> name >> ram;
+    }     
   }
-  return to_string(std::stod(returnValue)/1000);
+  int ram_float = std::stof(ram)/1000;
+  return std::to_string(ram_float);
 }
 
 string LinuxParser::Uid(int pid) { 
