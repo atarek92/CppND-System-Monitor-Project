@@ -208,19 +208,28 @@ string LinuxParser::Command(int pid) {
   }
 
 string LinuxParser::Ram(int pid) { 
-  
- string name, ram;
+ 
+  string name;
   string line;
+  long ram;
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatusFilename);
+
   if (stream.is_open()) {
-    while(std::getline(stream, line))
-    {
-      std::istringstream linestream(line);
-      linestream >> name >> ram;
-    }     
-  }
-  int ram_float = std::stof(ram)/1000;
-  return std::to_string(ram_float);
+        while (std::getline(stream, line)) 
+        {
+          std::replace(line.begin(), line.end(), ':', ' ');
+          std::istringstream linestream(line);
+          
+          while (linestream >> name >> ram) 
+          {
+            if (name == "VmSize") {
+            return std::to_string(ram/1000);
+            break;
+          }
+        }
+      }
+   }
+  return "";
 }
 
 string LinuxParser::Uid(int pid) { 
