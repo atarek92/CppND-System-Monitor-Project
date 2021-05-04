@@ -208,7 +208,7 @@ string LinuxParser::Command(int pid) {
   }
 
 string LinuxParser::Ram(int pid) { 
- 
+  
   string name;
   string line;
   long ram;
@@ -230,6 +230,7 @@ string LinuxParser::Ram(int pid) {
       }
    }
   return "";
+
 }
 
 string LinuxParser::Uid(int pid) { 
@@ -237,17 +238,16 @@ string LinuxParser::Uid(int pid) {
   string line;
   std::ifstream stream(kProcDirectory + to_string(pid) + kStatusFilename);
   if (stream.is_open()) {
-    do
+    while (std::getline(stream, line)) 
     {
-      std::getline(stream, line);
       std::istringstream linestream(line);
-      linestream >> name;
-    } while (name != "Uid:");
-    
-    std::istringstream linestream_final(line);
-    linestream_final >> name >> uid;
+      linestream >> name >> uid;
+      if (name == "Uid:") {
+        return uid;
+      }
+    } 
   }
-  return uid; 
+  return ""; 
   }
 
 string LinuxParser::User(int pid) { 
@@ -256,18 +256,17 @@ string LinuxParser::User(int pid) {
   string line;
   std::ifstream stream(kPasswordPath);
   if (stream.is_open()) {
-    do
+    while (std::getline(stream, line))
     {
-      std::getline(stream, line);
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       linestream >> name >> x >> uid;
-    } while (uid != uid_requested);
-    
-    std::istringstream linestream_final(line);
-    linestream_final >> name >> x >> uid;
+      if (uid == uid_requested) {
+        return name;
+      }
+    } 
   }
-  return name; 
+  return ""; 
   }
 
 long LinuxParser::UpTime(int pid) { 
